@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple API UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #character-list {
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: left;
+        }
+        .character {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f9f9f9;
+        }
+        input, button {
+            margin: 5px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Daftar Karakter</h1>
+    <div id="character-list"></div>
+
+    <h2>Tambah Karakter</h2>
+    <input type="text" id="name" placeholder="Nama" required>
+    <input type="number" id="age" placeholder="Umur" required>
+    <input type="text" id="power" placeholder="Kekuatan" required>
+    <button onclick="addCharacter()">Tambah</button>
+
+    <script>
+        // Fungsi untuk mengambil dan menampilkan karakter
+        function fetchCharacters() {
+            fetch('/characters')
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('character-list');
+                    list.innerHTML = '';
+                    data.data.forEach(char => {
+                        list.innerHTML += `
+                            <div class="character">
+                                <strong>${char.name}</strong> (${char.age} tahun) - ${char.power}
+                            </div>`;
+                    });
+                });
+        }
+
+        // Fungsi untuk menambahkan karakter baru
+        function addCharacter() {
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+            const power = document.getElementById('power').value;
+
+            fetch('/characters', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, age, power })
+            })
+            .then(response => response.json())
+            .then(() => {
+                fetchCharacters();
+                document.getElementById('name').value = '';
+                document.getElementById('age').value = '';
+                document.getElementById('power').value = '';
+            });
+        }
+
+        // Panggil fetchCharacters() saat halaman dimuat
+        fetchCharacters();
+    </script>
+
+</body>
+</html>
